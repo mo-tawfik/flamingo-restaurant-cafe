@@ -1171,9 +1171,9 @@
             { id: 'sd7', nameEn: 'Water Bottle', nameAr: 'زجاجة مياه', price: 10, cat: 'Soft Drinks' }
         ];
 
-        const categories = ['All', 'Coffee', 'Hot Drinks', 'Cold Drinks', 'Fresh Juice', 'Pancake & Waffle', 'Crepe', 'Sandwiches', 'Plates', 'Salads', 'Breakfast', 'Add Ons', 'Soft Drinks'];
+        const categories = ['Coffee', 'Hot Drinks', 'Cold Drinks', 'Fresh Juice', 'Pancake & Waffle', 'Crepe', 'Sandwiches', 'Plates', 'Salads', 'Breakfast', 'Add Ons', 'Soft Drinks'];
         
-        let currentCategory = 'All';
+        let currentCategory = 'Coffee';
         let searchQuery = '';
         let cart = [];
 
@@ -1207,12 +1207,22 @@
 
         function setCategory(cat) {
             currentCategory = cat;
+            searchQuery = '';
+            document.getElementById('menu-search').value = '';
             renderTabs();
             renderMenu();
         }
 
         document.getElementById('menu-search').addEventListener('input', (e) => {
             searchQuery = e.target.value.toLowerCase();
+            
+            if (searchQuery !== '') {
+                currentCategory = null; // Remove active tab highlight while searching globally
+            } else {
+                currentCategory = categories[0]; // Revert to Coffee when search is cleared
+            }
+            
+            renderTabs();
             renderMenu();
         });
 
@@ -1220,7 +1230,7 @@
             const grid = document.getElementById('menu-grid');
             
             const filtered = menuData.filter(item => {
-                const matchesCat = currentCategory === 'All' || item.cat === currentCategory;
+                const matchesCat = currentCategory === null || item.cat === currentCategory;
                 const matchesSearch = item.nameEn.toLowerCase().includes(searchQuery) || item.nameAr.includes(searchQuery);
                 return matchesCat && matchesSearch;
             });
@@ -1373,10 +1383,12 @@ Notes: ${notes || 'None'}`;
             clearCart();
         }
 
-        // Init
-        renderTabs();
-        renderMenu();
-        updateCartUI();
+        // Init on DOMContentLoaded to guarantee safe rendering
+        document.addEventListener('DOMContentLoaded', () => {
+            renderTabs();
+            renderMenu();
+            updateCartUI();
+        });
 
     </script>
 </body>
